@@ -22,17 +22,17 @@ SSAOOutput main(PixelInput aInput)
 {
     SSAOOutput output;
     
-    float4 worldPos = worldPositionTex.Sample(SSAOSampler, aInput.texCoord).rgba;
+    const float4 worldPos = worldPositionTex.Sample(SSAOSampler, aInput.texCoord).rgba;
     if (worldPos.a == 0.0f)
     {
         discard;
     }
 
     // returns the vertex normals 
-    float3 normal = normalize(2.0f * ambientOcclusionTex.Sample(SSAOSampler, aInput.texCoord).gba - 1.0f);
+    const float3 normal = normalize(2.0f * ambientOcclusionTex.Sample(SSAOSampler, aInput.texCoord).gba - 1.0f);
         
-    int nscale = 4;
-    float ar = 16 / 9;
+    const int nscale = 4;
+    const float ar = 16 / 9;
 
     int2 noiseScale = clientResolution;
     noiseScale.x = int(noiseScale.x / nscale);
@@ -44,8 +44,8 @@ SSAOOutput main(PixelInput aInput)
     float3 noise = NoiseTexture.Sample(WrappingSampler, noiseUV).rgb;
     noise.z = normalize(UnpackNormalZ(noise.x, noise.y));
 
-    float3 tangent = normalize(noise - normal * dot(noise, normal));
-    float3 bitangent = cross(normal, tangent);
+    const float3 tangent = normalize(noise - normal * dot(noise, normal));
+    const float3 bitangent = cross(normal, tangent);
 
     float3x3 TBN = float3x3(
 		normalize(tangent),
@@ -65,19 +65,19 @@ SSAOOutput main(PixelInput aInput)
         
         samplePos = worldPos.xyz + samplePos * rad;
 
-        float4 offset = mul(worldToClipSpaceMatrix, float4(samplePos, 1.0f));
+        const float4 offset = mul(worldToClipSpaceMatrix, float4(samplePos, 1.0f));
 
-        float3 sampledProjectedPos = offset.xyz / offset.w;
+        const float3 sampledProjectedPos = offset.xyz / offset.w;
             
         const float2 sampleUV = 0.5f + float2(0.5f, -0.5f) * sampledProjectedPos.xy;
 
-        float sampleDepth = depthTex.Sample(SSAOSampler, sampleUV.xy).r;
+        const float sampleDepth = depthTex.Sample(SSAOSampler, sampleUV.xy).r;
 
-        float3 sampledWP = worldPositionTex.Sample(SSAOSampler, sampleUV.xy).xyz;
+        const float3 sampledWP = worldPositionTex.Sample(SSAOSampler, sampleUV.xy).xyz;
 
-        float pixelDist = length(worldPos.xyz - sampledWP);
+        const float pixelDist = length(worldPos.xyz - sampledWP);
         
-        float rangeCheck = smoothstep(0.0f, 1.0f, rad / pixelDist);
+        const float rangeCheck = smoothstep(0.0f, 1.0f, rad / pixelDist);
      
         occlusion += (sampleDepth < sampledProjectedPos.z - bias ? 1.0f : 0.0f) * rangeCheck;
     }
