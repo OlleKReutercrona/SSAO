@@ -65,9 +65,8 @@ SSAOOutput main(PixelInput aInput)
         
         samplePos = worldPos.xyz + samplePos * rad;
 
-        float4 offset = float4(samplePos, 1.0f);
+        float4 offset = mul(worldToClipSpaceMatrix, float4(samplePos, 1.0f));
 
-        offset = mul(worldToClipSpaceMatrix, offset);
         float3 sampledProjectedPos = offset.xyz / offset.w;
             
         const float2 sampleUV = 0.5f + float2(0.5f, -0.5f) * sampledProjectedPos.xy;
